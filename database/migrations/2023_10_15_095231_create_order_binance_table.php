@@ -13,18 +13,18 @@ return new class extends Migration
     {
         Schema::create('order_binance', function (Blueprint $table) {
             $table->id();
-            $table->string('dt_ins');
-            $table->string('ts_ins');
+            $table->dateTime('dt_ins');
+            $table->timestamp('ts_ins');
             $table->foreignId('preorder_id')->references('id')->on('preorders');
-            $table->enum('stock', ['binance_spot', 'binance_futures']);
+            $table->foreignId('stock_id')->references('id')->on('stocks');
             $table->json('data');
             $table->integer('stock_order_id_1');
             $table->integer('stock_order_id_2');
             $table->enum('state', ['created', 'canceled', 'filled']);
-            $table->string('dt_upd');
-            $table->string('ts_upd');
-            $table->string('dt_check');
-            $table->string('ts_check');
+            $table->dateTime('dt_upd');
+            $table->timestamp('ts_upd');
+            $table->dateTime('dt_check');
+            $table->timestamp('ts_check');
         });
     }
 

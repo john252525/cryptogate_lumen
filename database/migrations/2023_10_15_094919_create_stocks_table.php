@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
-            $table->string('dt_ins');
-            $table->string('ts_ins');
+            $table->dateTime('dt_ins');
+            $table->timestamp('ts_ins');
             $table->foreignId('user_id')->references('id')->on('users');
             $table->enum('stock', ['binance_spot', 'binance_futures']);
             $table->json('key');
