@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('uuid');
             $table->dateTime('dt_ins');
-            $table->timestamp('ts_ins');
+            $table->integer('ts_ins');
             $table->foreignId('user_id')->references('id')->on('users');
             $table->integer('count_order');
         });

@@ -13,6 +13,13 @@
 |
 */
 
+use App\Http\Controllers\OrderController;
+
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+
+$router->get('/createOrder', 'OrderController@createOrder');
+$router->get('/getOrder', 'OrderController@getOrder');
+$router->get('/cancelOrder', 'OrderController@cancelOrder');

@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->dateTime('dt_ins');
-            $table->timestamp('ts_ins');
+            $table->integer('ts_ins');
             $table->foreignId('preorder_id')->references('id')->on('preorders');
             $table->enum('action', ['create', 'cancel', 'get']);
             $table->enum('mode', ['sync', 'async']);
-            $table->tinyInteger('state')->default(0);
+            $table->integer('state')->default(0);
             $table->dateTime('dt_upd');
-            $table->timestamp('ts_upd');
+            $table->integer('ts_upd');
         });
     }
 

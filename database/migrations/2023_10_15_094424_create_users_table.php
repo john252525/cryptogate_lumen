@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->dateTime('dt_ins');
-            $table->timestamp('ts_ins');
+            $table->integer('ts_ins');
             $table->string('token');
         });
     }

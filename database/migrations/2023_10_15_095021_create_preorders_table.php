@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('uuid');
             $table->dateTime('dt_ins');
-            $table->timestamp('ts_ins');
+            $table->integer('ts_ins');
             $table->foreignId('user_id')->references('id')->on('users');
-            $table->foreignId('deal_id')->references('id')->on('deals');
+            $table->integer('deal_id')->default(-1);
             $table->foreignId('stock_id')->references('id')->on('stocks');
             $table->enum('type', ['market', 'limit', 'oco']);
             $table->enum('side', ['buy', 'sell']);
