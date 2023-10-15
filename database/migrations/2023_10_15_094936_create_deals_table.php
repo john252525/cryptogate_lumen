@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('deals', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->string('uuid');
+            $table->string('dt_ins');
+            $table->string('ts_ins');
+            $table->foreignId('user_id')->references('id')->on('users');
+            $table->integer('count_order');
         });
     }
 
