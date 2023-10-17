@@ -162,12 +162,18 @@ class OrderController extends Controller
                     "error" => "wrong pair"
                 ]);
             }
+            $jsonData = [];
 
             if (!isset($value->data)) {
-                return response()->json([
-                    "ok" => false,
-                    "error" => "wrong data"
-                ]);
+                if (isset($value->qty)) {
+                    $jsonData["qty"] = $value->qty;
+                }
+                if (isset($value->price)) {
+                    $jsonData["price"] = $value->price;
+                }
+                if (isset($value->stoploss)) {
+                    $jsonData["stoploss"] = $value->stoploss;
+                }
             }
 
 
@@ -183,7 +189,7 @@ class OrderController extends Controller
             $preorder->positionSide = $value->positionSide;
             $preorder->pair = $value->pair;
             $preorder->state = "new";
-            $preorder->data = json_encode($value->data);
+            $preorder->data = json_encode( $jsonData);
             $preorder->save();
             $preorders[] = $preorder;
             $task = new Task();
