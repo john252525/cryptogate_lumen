@@ -56,6 +56,13 @@ class OrderController extends Controller
             $data = json_decode($data);
         }
 
+        if (!is_array($data)) {
+            return response()->json([
+                "ok" => false,
+                "error" => "wrong json"
+            ]);
+        }
+
         $data_count = count($data);
         if ($data_count === 0) {
             return response()->json(["json" => "The json field must not contain at least one element"]);

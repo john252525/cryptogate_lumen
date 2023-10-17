@@ -1,0 +1,12 @@
+{
+    "stock":"binance_spot",
+    "type":"market",
+    "side":"buy",
+    "positionSide":"long",
+    "pair":"btc_usdt",
+    "data":{
+        "qty":"20",
+        "price":"26000",
+        "stoploss":"25000"
+    }
+}
