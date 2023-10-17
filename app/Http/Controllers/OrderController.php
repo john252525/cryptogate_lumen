@@ -26,12 +26,29 @@ class OrderController extends Controller
             'token' => 'required|string',
         ]);
 
-        if (!$request->has('json')) {
-            return response()->json([
-                "ok" => false,
-                "error" => "wrong json"
-            ]);
+        if ($request->method() === "GET") {
+            if (!$request->has('json')) {
+                return response()->json([
+                    "ok" => false,
+                    "error" => "wrong json"
+                ]);
+            }
+
+            $data = $request->get('json');
+            if (gettype($data) === "string") {
+                $data = json_decode($data);
+            }
+        } else {
+            if ($request->has('json')) {
+                $data = $request->get('json');
+                if (gettype($data) === "string") {
+                    $data = json_decode($data);
+                }
+            } else {
+                $data = json_decode(file_get_contents('php://input'), 1);;
+            }
         }
+
 
         if ($request->has('type')) {
             $type = $request->get('type');
@@ -51,12 +68,9 @@ class OrderController extends Controller
             ]);
         }
 
-        $data = $request->get('json');
-        if (gettype($data) === "string") {
-            $data = json_decode($data);
-        }
 
-        if (!is_array($data)) {
+
+        if (!is_array($data) || null) {
             return response()->json([
                 "ok" => false,
                 "error" => "wrong json"
