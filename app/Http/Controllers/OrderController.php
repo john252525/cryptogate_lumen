@@ -174,6 +174,8 @@ class OrderController extends Controller
                 if (isset($value->stoploss)) {
                     $jsonData["stoploss"] = $value->stoploss;
                 }
+            } else {
+                $jsonData = $value->data;
             }
 
 
@@ -189,7 +191,7 @@ class OrderController extends Controller
             $preorder->positionSide = $value->positionSide;
             $preorder->pair = $value->pair;
             $preorder->state = "new";
-            $preorder->data = json_encode( $jsonData);
+            $preorder->data = json_encode($jsonData);
             $preorder->save();
             $preorders[] = $preorder;
             $task = new Task();
