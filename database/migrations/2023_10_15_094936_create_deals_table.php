@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('deals', function (Blueprint $table) {
+        Schema::create('deal', function (Blueprint $table) {
             $table->id();
             $table->string('uuid');
             $table->dateTime('dt_ins');
             $table->integer('ts_ins');
-            $table->foreignId('user_id')->references('id')->on('users');
+            $table->foreignId('user_id')->references('id')->on('user');
             $table->integer('count_order');
         });
     }

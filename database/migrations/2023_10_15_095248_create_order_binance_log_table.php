@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->dateTime('dt_ins');
             $table->integer('ts_ins');
-            $table->foreignId('user_id')->references('id')->on('users');
-            $table->foreignId('stock_id')->references('id')->on('stocks');
+            $table->foreignId('user_id')->references('id')->on('user');
+            $table->foreignId('stock_id')->references('id')->on('stock');
             $table->enum('action', ['create', 'cancel', 'get', 'websocket']);
             $table->json('request')->nullable(true);
             $table->json('data')->nullable(true);

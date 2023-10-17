@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Preorder extends Model
 {
-    protected $table = 'preorders';
+    protected $table = 'preorder';
 
     public $timestamps = false;
 

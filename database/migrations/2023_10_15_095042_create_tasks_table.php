@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tasks', function (Blueprint $table) {
+        Schema::create('task', function (Blueprint $table) {
             $table->id();
             $table->dateTime('dt_ins');
             $table->integer('ts_ins');
-            $table->foreignId('preorder_id')->references('id')->on('preorders');
+            $table->foreignId('preorder_id')->references('id')->on('preorder');
             $table->enum('action', ['create', 'cancel', 'get']);
             $table->enum('mode', ['sync', 'async']);
             $table->integer('state')->default(0);

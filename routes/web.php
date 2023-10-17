@@ -23,3 +23,7 @@ $router->get('/', function () use ($router) {
 $router->get('/createOrder', 'OrderController@createOrder');
 $router->get('/getOrder', 'OrderController@getOrder');
 $router->get('/cancelOrder', 'OrderController@cancelOrder');
+
+$router->post('/createOrder', 'OrderController@createOrder');
+$router->post('/getOrder', 'OrderController@getOrder');
+$router->post('/cancelOrder', 'OrderController@cancelOrder');

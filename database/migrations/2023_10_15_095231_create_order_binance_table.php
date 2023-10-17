@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->dateTime('dt_ins');
             $table->integer('ts_ins');
-            $table->foreignId('preorder_id')->references('id')->on('preorders');
-            $table->foreignId('stock_id')->references('id')->on('stocks');
+            $table->foreignId('preorder_id')->references('id')->on('preorder');
+            $table->foreignId('stock_id')->references('id')->on('stock');
             $table->json('data')->nullable(true);
             $table->integer('stock_order_id_1')->nullable(true);
             $table->integer('stock_order_id_2')->nullable(true);

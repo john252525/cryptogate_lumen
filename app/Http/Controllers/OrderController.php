@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Deal;
 use App\Models\Preorder;
+use App\Models\Stock;
 use App\Models\Task;
 use App\Models\User;
 use DateTime;
@@ -19,23 +20,45 @@ class OrderController extends Controller
      */
     public function createOrder(Request $request): JsonResponse
     {
+        $type = env('DEFAULT_MODE_CREATE');
         $this->validate($request, [
-            'type' => ['required', 'in:sync,async'],
+            'type' => ['in:sync,async'],
             'token' => 'required|string',
-            'data' => 'required|json',
         ]);
 
+        if (!$request->has('json')) {
+            return response()->json([
+                "ok" => false,
+                "error" => "wrong json"
+            ]);
+        }
+
+        if ($request->has('type')) {
+            $type = $request->get('type');
+        }
+
         $state = 0;
-        if ($request->get('type') == 'sync') {
+        if ($type == 'sync') {
             $state = mt_rand(1000000,9999999);
         }
 
         $user = User::where('token', $request->get('token'))->first();
 
-        $data = json_decode($request->get('data'));
+        if (!$user) {
+            return response()->json([
+                "ok" => false,
+                "error" => "wrong token"
+            ]);
+        }
+
+        $data = $request->get('json');
+        if (gettype($data) === "string") {
+            $data = json_decode($data);
+        }
+
         $data_count = count($data);
         if ($data_count === 0) {
-            return response()->json(["data" => "The data field must not contain at least one element"]);
+            return response()->json(["json" => "The json field must not contain at least one element"]);
         }
 
         $date = new DateTime();
@@ -53,7 +76,80 @@ class OrderController extends Controller
 
         $preorders = [];
 
+
         foreach ($data as $value) {
+            if (gettype($value) === 'array') {
+                $value = (object) $value;
+            }
+
+            if (!isset($value->stock)) {
+                return response()->json([
+                    "ok" => false,
+                    "error" => "wrong stock"
+                ]);
+            }
+
+            if (gettype($value->stock) === "string") {
+                if ($value->stock === "binance_spot" || $value->stock === "binance_futures") {
+                    $stock = Stock::where('user_id', $user->id)->where('stock', $value->stock)->first();
+                    if (!$stock) {
+                        return response()->json([
+                            "ok" => false,
+                            "error" => "wrong stock"
+                        ]);
+                    }
+                    $value->stock = $stock->id;
+                } else {
+                    return response()->json([
+                        "ok" => false,
+                        "error" => "wrong stock"
+                    ]);
+                }
+
+
+            }
+
+            $typeValidate = ['market', 'limit', 'oco'];
+            $sideValidate = ['buy', 'sell'];
+            $positionSide = ['long', 'short'];
+            $stateValidate = ['new', 'pending', 'created', 'canceled', 'filled'];
+
+            if (!isset($value->type) || !in_array($value->type, $typeValidate)) {
+                return response()->json([
+                    "ok" => false,
+                    "error" => "wrong type"
+                ]);
+            }
+
+            if (!isset($value->side) || !in_array($value->side, $sideValidate)) {
+                return response()->json([
+                    "ok" => false,
+                    "error" => "wrong side"
+                ]);
+            }
+
+            if (!isset($value->positionSide) || !in_array($value->positionSide, $positionSide)) {
+                return response()->json([
+                    "ok" => false,
+                    "error" => "wrong positionSide"
+                ]);
+            }
+
+            if (!isset($value->pair)) {
+                return response()->json([
+                    "ok" => false,
+                    "error" => "wrong pair"
+                ]);
+            }
+
+            if (!isset($value->data)) {
+                return response()->json([
+                    "ok" => false,
+                    "error" => "wrong data"
+                ]);
+            }
+
+
             $preorder = new Preorder();
             $preorder->uuid = $this->format_uuidv4(random_bytes(16));
             $preorder->dt_ins = $date;
@@ -80,8 +176,8 @@ class OrderController extends Controller
             $task->save();
         }
 
-        if ($request->get('type') === 'sync') {
-            // tasker
+        if ($type === 'sync') {
+            Artisan::call('tasker', ['state' => $state]);
         }
 
         return response()->json([
@@ -90,23 +186,44 @@ class OrderController extends Controller
             "orders" => $preorders
         ]);
     }
-
     public function getOrder(Request $request)
     {
+        $type = env('DEFAULT_MODE_GET');
+
         $this->validate($request, [
-            'type' => ['required', 'in:sync,async'],
+            'type' => ['in:sync,async'],
             'token' => 'required|string',
             'order_id' => 'required|integer|string',
         ]);
 
+        if ($request->has('type')) {
+            $type = $request->get('type');
+        }
+
         $state = 0;
-        if($request->get('type' === 'sync')) {
+        if($type === 'sync') {
             $state = mt_rand(1000000,9999999);
         }
 
 
         $user = User::where('token', $request->get('token'))->first();
+
+        if (!$user) {
+            return response()->json([
+                "ok" => false,
+                "error" => "wrong token"
+            ]);
+        }
+
         $preorder = Preorder::find($request->get('order_id'));
+
+        if (!$preorder) {
+            return response()->json([
+                "ok" => false,
+                "error" => "wrong id"
+            ]);
+        }
+
         $date = new DateTime();
         $task = new Task();
         $task->dt_ins = $date;
@@ -124,8 +241,8 @@ class OrderController extends Controller
             $deal = Deal::find($preorder->deal_id);
         }
 
-        if ($request->get('type') === 'sync') {
-            // tasker
+        if ($type === 'sync') {
+            Artisan::call('tasker', ['state' => $state]);
         }
 
         return response()->json(
@@ -138,20 +255,37 @@ class OrderController extends Controller
     }
     public function cancelOrder(Request $request)
     {
+        $type = env('DEFAULT_MODE_GET');
         $this->validate($request, [
-            'type' => ['required', 'in:sync,async'],
+            'type' => ['in:sync,async'],
             'token' => 'required|string',
             'order_id' => 'required|integer|string',
         ]);
 
         $state = 0;
-        if($request->get('type' === 'sync')) {
+        if($type === 'sync') {
             $state = mt_rand(1000000,9999999);
         }
 
 
         $user = User::where('token', $request->get('token'))->first();
+
+        if (!$user) {
+            return response()->json([
+                "ok" => false,
+                "error" => "wrong token"
+            ]);
+        }
+
         $preorder = Preorder::find($request->get('order_id'));
+
+        if (!$preorder) {
+            return response()->json([
+                "ok" => false,
+                "error" => "wrong id"
+            ]);
+        }
+
         $date = new DateTime();
         $task = new Task();
         $task->dt_ins = $date;
@@ -169,7 +303,7 @@ class OrderController extends Controller
             $deal = Deal::find($preorder->deal_id);
         }
 
-        if ($request->get('type') === 'sync') {
+        if ($type === 'sync') {
             Artisan::call('tasker', ['state' => $state]);
         }
 

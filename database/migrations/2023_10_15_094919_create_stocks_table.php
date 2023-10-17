@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stocks', function (Blueprint $table) {
+        Schema::create('stock', function (Blueprint $table) {
             $table->id();
             $table->dateTime('dt_ins');
             $table->integer('ts_ins');
-            $table->foreignId('user_id')->references('id')->on('users');
+            $table->foreignId('user_id')->references('id')->on('user');
             $table->enum('stock', ['binance_spot', 'binance_futures']);
             $table->json('key');
         });
