@@ -212,7 +212,9 @@ class OrderController extends Controller
         return response()->json([
             "ok" => true,
             "deal" => isset($deal) ? $deal : null,
-            "orders" => $preorders
+            "orders" => $preorders,
+            "task" => $task,
+            "stock" => $stock,
         ]);
     }
     public function getOrder(Request $request)
